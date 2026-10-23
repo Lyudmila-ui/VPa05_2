@@ -1,0 +1,6 @@
+.key
+password.db
+__pycache__/
+*.pyc
+.venv/
+build/
