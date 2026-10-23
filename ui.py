@@ -424,6 +424,7 @@ class GeneratorDialog(tk.Toplevel):
         self.lower_var = tk.BooleanVar(value=True)
         self.digits_var = tk.BooleanVar(value=True)
         self.special_var = tk.BooleanVar(value=True)
+        self.similar_var = tk.BooleanVar(value=False)
         self.password_var = tk.StringVar()
         self._regen_job = None
 
@@ -499,6 +500,19 @@ class GeneratorDialog(tk.Toplevel):
                 font=app.body_font,
                 anchor="w",
             ).grid(row=index // 2, column=index % 2, sticky="w", padx=(0, 18), pady=2)
+        tk.Checkbutton(
+            checks,
+            text="Исключить похожие символы 0/O и l/I",
+            variable=self.similar_var,
+            command=self.regenerate,
+            bg=SHEET,
+            fg=INK,
+            activebackground=SHEET,
+            activeforeground=INK,
+            selectcolor=WHITE,
+            font=app.body_font,
+            anchor="w",
+        ).grid(row=2, column=0, columnspan=2, sticky="w", pady=(6, 2))
 
         tk.Label(form, text="Пароль", bg=SHEET, fg=INK, font=app.body_font).pack(anchor="w")
         preview = tk.Entry(
@@ -574,6 +588,7 @@ class GeneratorDialog(tk.Toplevel):
                 bool(self.lower_var.get()),
                 bool(self.digits_var.get()),
                 bool(self.special_var.get()),
+                exclude_similar=bool(self.similar_var.get()),
             )
         except ValueError as exc:
             self.form_status.config(text=str(exc), fg=DANGER)

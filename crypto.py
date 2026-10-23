@@ -12,6 +12,7 @@ UPPERCASE = string.ascii_uppercase
 LOWERCASE = string.ascii_lowercase
 DIGITS = string.digits
 SPECIAL = "!@#$%^&*()-_=+"
+SIMILAR_CHARACTERS = "0OlI"
 
 MIN_PASSWORD_LENGTH = 1
 MAX_PASSWORD_LENGTH = 64
@@ -77,12 +78,19 @@ def verify_master_password(password: str, password_hash: str) -> bool:
     return secrets.compare_digest(actual, password_hash)
 
 
+def _character_pool(chars: str, exclude_similar: bool) -> str:
+    if not exclude_similar:
+        return chars
+    return "".join(char for char in chars if char not in SIMILAR_CHARACTERS)
+
+
 def generate_password(
     length: int,
     use_upper: bool,
     use_lower: bool,
     use_digits: bool,
     use_special: bool,
+    exclude_similar: bool = False,
 ) -> str:
     """Собрать пароль из выбранных наборов символов."""
     if length < MIN_PASSWORD_LENGTH or length > MAX_PASSWORD_LENGTH:
@@ -92,13 +100,14 @@ def generate_password(
 
     pools = []
     if use_upper:
-        pools.append(UPPERCASE)
+        pools.append(_character_pool(UPPERCASE, exclude_similar))
     if use_lower:
-        pools.append(LOWERCASE)
+        pools.append(_character_pool(LOWERCASE, exclude_similar))
     if use_digits:
-        pools.append(DIGITS)
+        pools.append(_character_pool(DIGITS, exclude_similar))
     if use_special:
-        pools.append(SPECIAL)
+        pools.append(_character_pool(SPECIAL, exclude_similar))
+    pools = [pool for pool in pools if pool]
 
     if not pools:
         raise ValueError("Выберите хотя бы один тип символов.")
